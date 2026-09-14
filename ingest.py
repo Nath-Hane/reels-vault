@@ -253,11 +253,13 @@ def main():
     vault = Path(args.vault)
     dossier_raw = vault / "raw"
     dossier_images = vault / "images"
-    dossier_temp = vault / ".temp"
+    dossier_temp = vault / "tmp"
     for d in (dossier_raw, dossier_images, dossier_temp):
         d.mkdir(parents=True, exist_ok=True)
 
-    chemin_journal = vault / "journal.json"
+    chemin_journal = vault / "01_ingest" / "output" / "journal.json"
+    if not chemin_journal.exists() and (vault / "journal.json").exists():
+        chemin_journal = vault / "journal.json"
     journal = charger_journal(chemin_journal)
 
     liens = extraire_liens(args.fichier)
