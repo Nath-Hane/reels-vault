@@ -394,3 +394,21 @@ Puis `Ctrl+G` dans Obsidian. Monte **Repel** dans les réglages « Forces » pou
 - **`graphe.py`** — création des liens pour Obsidian
 
 *Tuto rédigé après un montage réel, du premier `winget install` jusqu'au circuit de voyage. Les pièges décrits ont tous été rencontrés pour de vrai.*
+
+---
+
+## Architecture ICM (Interpretable Context Methodology)
+
+Ce projet est initialisé selon la méthodologie **ICM / Model Workspace Protocol** ([arXiv:2603.16021](https://arxiv.org/abs/2603.16021)), qui structure le contexte de l'agent IA à travers le système de fichiers :
+
+- **`GLOBAL_IDENTITY.md`** : Identité globale et principes du système.
+- **`ROUTING.md`** : Matrice de routage des tâches vers les étapes du pipeline.
+- **`_config/`** : Règles d'indexation et configurations métiers.
+- **`.agents/docs/ICM_ARCHITECTURE.md`** : Documentation complète de l'architecture.
+
+### Étapes du Pipeline (`0X_stage/`)
+1. **`01_ingest/`** : Ingestion & transcription Whisper (`ingest.py`).
+2. **`02_indexing/`** : Analyse par lots et résumés structurés (`index.md`).
+3. **`03_viewer/`** : Génération de l'interface hors-ligne (`vault.html`).
+4. **`04_graph/`** : Génération des cartes thématiques Obsidian (`graphe.py`).
+
