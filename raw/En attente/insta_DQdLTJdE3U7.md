@@ -1,0 +1,26 @@
+---
+source: https://www.instagram.com/reel/DQdLTJdE3U7/
+plateforme: Instagram
+genre: video
+auteur: Shenzi ~33
+duree_s: 55.81999969482422
+traite_le: 2026-09-08
+statut: brut
+---
+
+# Video by shenzi_33_
+
+## Description
+Follow @shenzi_33_
+.
+.
+日本利用压电瓷砖将脚步转化为电能。这些瓷砖捕捉来自你脚步的动能。当你行走时，你的重量和动作会对瓷砖产生压力。瓷砖会轻微弯曲，从而产生机械应力。瓷砖内部的压电材料将这种应力转化为电能。每一步都会产生少量电荷，而数百万步结合在一起就能产生足够的电力来驱动LED灯、数字显示屏和传感器。在像涩谷这样繁忙的地方，每天大约有240万脚步为这一系统作出贡献。这些电能可以被储存或立即使用，从而减少对传统电力来源的依赖，并支持可持续的城市基础设施。这种方法将日常运动转化为实用的可再生能源
+#日本 #知识 #事实 #你知道吗 #推荐 #科技 #创新 #历史 #技术 #实验
+
+## Transcription audio
+(pas d'audio exploitable)
+
+## Images
+- images/insta_DQdLTJdE3U7_1.jpg
+- images/insta_DQdLTJdE3U7_2.jpg
+- images/insta_DQdLTJdE3U7_3.jpg

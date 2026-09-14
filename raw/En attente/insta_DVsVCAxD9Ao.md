@@ -1,0 +1,22 @@
+---
+source: https://www.instagram.com/reel/DVsVCAxD9Ao/
+plateforme: Instagram
+genre: video
+auteur: Bryan Low
+duree_s: 175.05299377441406
+traite_le: 2026-09-08
+statut: brut
+---
+
+# Video by bryanlowwww
+
+## Description
+what do you think I should read next?
+
+## Transcription audio
+5 books that will make you dangerous. Let's go. You guys requested for it? 5 that I want to get keeps so bad. So you're watching this, save this video so you can come back to this anytime you want. In Chinese there is a saying 書中自由往, 金屋書中自由眼欲欲 It means books hold houses of gold and books hold beauty beyond measure. Basically everything you ever need in life, someone has already figured it out, written down and left it in a book for you. When you read, you collect perspectives. You see angles people can't see and it's what makes you dangerous. Because when you see more, you think more. When you think more, you move faster. When you move faster than anyone around you, nobody can touch you. Sounds good? Let's get started. Book number one, The Art of War. My all-time faith. This book is over 2,000 years old and it's still one of the most dangerous things you can ever read. Because it's not about war, it's about strategy. The line that hit me the hardest is 自己給自己被, 把自己不待. Know yourself and know your enemy and you will never lose. Most people live in life not because they're weak but because they don't know themselves. They basically just move without knowing. This book teaches you how to be calculated, patient and intentional. Generals use this to win wars. CEOs use this to build empires and you can use this to win in whatever game you're playing. Book two, The Decision Book. 50 models for strategic thinking. That's the whole book. Most will make decisions based on feelings, based on the mood, based on what their friends think and then they wonder why they keep ending up in the same place. This book gives you actual frameworks, tools to make better decisions faster. In life, you're a sum of your decisions. Every single thing you have right now, good or bad, it's an outcome of the decision you make. So the person that makes better decisions wins. Simple that. Book three, See You at the Top. Look at this book, Old Cover, Yellow Insight and it's still one of the most powerful things ever written. Ziggler wrote this when the world told him he couldn't make it. And one thing he talks about more than anything else, your self-image. How you see yourself is everything. If you see yourself as someone who loses, you will find a way to lose. If you see yourself as someone who wins, you will find a way to win. Now most people are walking around with a broken image of themselves. The story they picked up from childhood, from a teacher who doubted them, from parents who didn't believe, from a heartbreak they never healed from and they carry that story all the way to the grave without ever questioning it. This book will make you rewrite that story. And when the story changes, everything changes. Book four, It Rules of Love. Before I scroll past thinking this is just another relationship book, it's not. It's about how to love without losing yourself. How to build relationships that actually make you better. How to let go of people who aren't meant for you without business, without carrying that weight into the next chapter of your life. The most powerful people I know are emotionally intelligent. They know how to manage relationships. They know how to communicate. They know how to love people without needing people. Because when you are emotionally whole, nobody can manipulate you. Book five, The Cat Who Taught Zeb. I know it looks like a children's book, just trust me on this one, okay? This book will slow you down in the best way possible. It's about presence, stillness, not letting your brain run to your life. And in a world that's constantly loud, constantly demanding your attention, your energy, your reaction, the person who can be still, that person has super power. His peace is power, you know, especially when your soul come while everybody is just panicking. Dangerous simply means you have more perspective than the person next to you. And these five books can be your set one today. But remember this, Su Zhong Zi Yao, Wang Ganggong, Su Zhong Zi Yao, Ngan, New York. Learn something today, follow for more.
+
+## Images
+- images/insta_DVsVCAxD9Ao_1.jpg
+- images/insta_DVsVCAxD9Ao_2.jpg
+- images/insta_DVsVCAxD9Ao_3.jpg
