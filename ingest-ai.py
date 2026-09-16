@@ -18,6 +18,7 @@ Usage :
 """
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -28,7 +29,7 @@ from pathlib import Path
 
 # ---------------------------------------------------------------- configuration
 
-VAULT = Path.home() / "vault"          # modifiable avec --vault
+VAULT = Path(".")                      # modifiable avec --vault
 MODELE_WHISPER = "small"               # tiny / base / small / medium
 PAUSE_ENTRE_VIDEOS = 3                 # secondes, pour ne pas se faire bloquer
 NB_IMAGES = 3
@@ -70,15 +71,51 @@ def verifier_outils():
 
 def extraire_liens(chemin):
     """Récupère toutes les URLs TikTok/Instagram d'un fichier, quel que soit
-    son format (txt, csv, json d'export). Les doublons sont supprimés."""
-    texte = Path(chemin).read_text(encoding="utf-8", errors="ignore")
+    son format (txt, csv, json d'export). Les doublons sont supprimés.
+    Retourne (liens, dictionnaire_metadonnees_secours)."""
+    p = Path(chemin)
+    secours = {}
     liens, vus = [], set()
+
+    if p.suffix.lower() == ".json":
+        try:
+            donnees = json.loads(p.read_text(encoding="utf-8"))
+            if isinstance(donnees, list):
+                for item in donnees:
+                    url = None
+                    caption = ""
+                    owner = "inconnu"
+                    label_values = item.get("label_values", [])
+                    for lv in label_values:
+                        label = lv.get("label") or lv.get("title")
+                        if label == "URL":
+                            url = lv.get("value")
+                        elif label == "Caption":
+                            caption = lv.get("value", "")
+                        elif label == "Owner":
+                            dict_list = lv.get("dict", [])
+                            if dict_list:
+                                inner = dict_list[0].get("dict", [])
+                                for d in inner:
+                                    if d.get("label") == "Username":
+                                        owner = d.get("value", owner)
+                    if url and ("/reel/" in url or "/p/" in url or "/tv/" in url or "tiktok.com" in url):
+                        if url not in vus:
+                            vus.add(url)
+                            liens.append(url)
+                            secours[url] = {"description": caption, "uploader": owner}
+                return liens, secours
+        except Exception:
+            raise
+
+    texte = p.read_text(encoding="utf-8", errors="ignore")
     for lien in MOTIF_LIEN.findall(texte):
         lien = lien.rstrip(".,;")
         if lien not in vus:
             vus.add(lien)
             liens.append(lien)
-    return liens
+    return liens, secours
+
 
 
 def options_cookies(cookies):
@@ -104,11 +141,13 @@ def sauver_journal(chemin, journal):
 
 
 def identifiant(lien):
-    """Un nom de fichier court et sûr, dérivé de l'URL."""
+    """Un nom de fichier court, sûr et déterministe, dérivé de l'URL."""
     fin = lien.rstrip("/").split("/")[-1].split("?")[0]
     fin = re.sub(r"[^A-Za-z0-9_-]", "", fin)[:40]
     plateforme = "tiktok" if "tiktok" in lien else "insta"
-    return f"{plateforme}_{fin or str(abs(hash(lien)))[:10]}"
+    if not fin:
+        fin = hashlib.md5(lien.encode("utf-8")).hexdigest()[:10]
+    return f"{plateforme}_{fin}"
 
 
 # ---------------------------------------------------------------- étapes
@@ -173,10 +212,10 @@ def telecharger_carrousel(lien, dossier_images, nom, cookies):
 
     legende = ""
     for fichier_meta in sorted(cible.glob("*.json")):
-        try:
-            donnees = json.loads(fichier_meta.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
+        # try:
+        donnees = json.loads(fichier_meta.read_text(encoding="utf-8"))
+        # except (OSError, json.JSONDecodeError):
+        #     continue
         legende = donnees.get("description") or donnees.get("caption") or ""
         if legende:
             break
@@ -186,8 +225,18 @@ def telecharger_carrousel(lien, dossier_images, nom, cookies):
 
 def extraire_images(video, dossier_images, nom, duree):
     """Prend NB_IMAGES captures réparties dans la vidéo."""
-    if video is None or not duree:
+    if video is None:
         return []
+    if not duree:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(video)],
+            capture_output=True, text=True
+        )
+        try:
+            duree = float(result.stdout.strip())
+        except ValueError:
+            return []
+            
     chemins = []
     for i in range(NB_IMAGES):
         instant = duree * (i + 1) / (NB_IMAGES + 1)
@@ -211,17 +260,28 @@ def ecrire_fiche(dossier, vault, nom, lien, meta, transcription, images, genre):
         except ValueError:
             liens_images.append(f"- {p.name}")
 
+    # Titre intelligent : si pas de titre yt-dlp, prendre la 1re ligne de la description
+    titre = meta.get("title")
+    if not titre or titre == nom:
+        desc_lines = [l.strip() for l in (meta.get("description") or "").splitlines() if l.strip()]
+        titre = desc_lines[0] if desc_lines else nom
+    titre_propre = re.sub(r"[\r\n]+", " ", titre)[:120].strip() or nom
+
+    auteur = meta.get("uploader") or meta.get("channel") or "inconnu"
+    auteur_yaml = json.dumps(str(auteur), ensure_ascii=False)
+    lien_yaml = json.dumps(str(lien), ensure_ascii=False)
+
     contenu = f"""---
-source: {lien}
+source: {lien_yaml}
 plateforme: {"TikTok" if "tiktok" in lien else "Instagram"}
 genre: {genre}
-auteur: {meta.get("uploader") or meta.get("channel") or "inconnu"}
+auteur: {auteur_yaml}
 duree_s: {meta.get("duration") or ""}
 traite_le: {datetime.now():%Y-%m-%d}
 statut: brut
 ---
 
-# {(meta.get("title") or nom)[:120]}
+# {titre_propre}
 
 ## Description
 {(meta.get("description") or "").strip() or "(vide)"}
@@ -253,14 +313,17 @@ def main():
     vault = Path(args.vault)
     dossier_raw = vault / "raw"
     dossier_images = vault / "images"
-    dossier_temp = vault / ".temp"
+    dossier_temp = vault / "tmp"
     for d in (dossier_raw, dossier_images, dossier_temp):
         d.mkdir(parents=True, exist_ok=True)
 
-    chemin_journal = vault / "journal.json"
+    chemin_journal = vault / "01_ingest" / "output" / "journal.json"
+    if not chemin_journal.exists() and (vault / "journal.json").exists():
+        chemin_journal = vault / "journal.json"
+    chemin_journal.parent.mkdir(parents=True, exist_ok=True)
     journal = charger_journal(chemin_journal)
 
-    liens = extraire_liens(args.fichier)
+    liens, secours_meta = extraire_liens(args.fichier)
     a_faire = [l for l in liens if journal.get(l, {}).get("statut") != "ok"]
     if args.limite:
         a_faire = a_faire[: args.limite]
@@ -278,15 +341,39 @@ def main():
         nom = identifiant(lien)
         log(f"[{numero}/{len(a_faire)}] {lien}")
         try:
-            erreur_meta = ""
             try:
                 meta = recuperer_metadonnees(lien, args.cookies)
+                erreur_meta = ""
             except Exception as e:
-                meta = {}  # carrousel, ou probleme d'acces
+                meta = secours_meta.get(lien, {}).copy()
                 erreur_meta = str(e).replace("\n", " ")[:300]
 
+            # Enrichissement avec les métadonnées de secours si manquantes
+            if lien in secours_meta:
+                secours = secours_meta[lien]
+                if not meta.get("description") and secours.get("description"):
+                    meta["description"] = secours["description"]
+                if (not meta.get("uploader") or meta.get("uploader") == "inconnu") and secours.get("uploader"):
+                    meta["uploader"] = secours["uploader"]
+
             audio = video = None
-            if meta.get("duration"):
+            
+            # Détection du genre prioritaire par URL
+            if "/reel/" in lien or "tiktok.com" in lien:
+                genre_url = "video"
+            else:
+                genre_url = None
+
+            # Un lien /p/ peut être une vidéo même sans durée. 
+            # yt-dlp renvoie _type == 'video' ou un vcodec quand il y a un flux vidéo.
+            is_video = (
+                genre_url == "video" 
+                or meta.get("duration") 
+                or meta.get("vcodec") not in (None, "none")
+                or meta.get("_type") == "video"
+            )
+
+            if is_video:
                 genre = "video"
                 audio, video = telecharger_media(lien, dossier_temp, nom,
                                                  args.cookies)
@@ -298,13 +385,14 @@ def main():
                 transcription = ""
                 images, legende = telecharger_carrousel(lien, dossier_images,
                                                         nom, args.cookies)
-                if not images:
-                    raise RuntimeError(
-                        "ni vidéo ni image récupérée | yt-dlp : "
-                        + (erreur_meta or "aucun message")
-                    )
                 if legende and not meta.get("description"):
                     meta["description"] = legende
+
+                if not images:
+                    raise RuntimeError(
+                        "aucune image récupérée pour le carrousel (vérifiez gallery-dl / cookies) | yt-dlp : "
+                        + (erreur_meta or "aucun message")
+                    )
 
             ecrire_fiche(dossier_raw, vault, nom, lien, meta, transcription,
                          images, genre)
@@ -312,6 +400,11 @@ def main():
             for fichier in (audio, video):
                 if fichier and fichier.exists():
                     fichier.unlink()
+            for temp_f in dossier_temp.glob(f"{nom}.*"):
+                try:
+                    temp_f.unlink()
+                except OSError:
+                    pass
 
             journal[lien] = {"statut": "ok", "fiche": f"{nom}.md"}
             reussites += 1
